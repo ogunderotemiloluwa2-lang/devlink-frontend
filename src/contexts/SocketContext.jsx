@@ -19,7 +19,7 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    const newSocket = io(import.meta.env.VITE_API_BASE_URL || "", {
+    const newSocket = io(import.meta.env.VITE_BACKEND_URL || "", {
       auth: { token: accessToken },
       transports: ["websocket"],
     });
