@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
-// Set base path for GitHub Pages deployment
+// Set base path for deployment
 // For GitHub Pages, the base should be /<repository-name>/
 // For other deployments (Vercel, local dev), use /
 const base = process.env.GITHUB_PAGES ? "/devlink-frontend/" : "/";
