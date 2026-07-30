@@ -226,19 +226,26 @@ export default function MessageThread({ conversationId, onBack }) {
   if (loading) {
     return (
       <div className="flex h-full flex-col">
-        <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
-          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+        <div className="flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
+            <div className="space-y-1">
+              <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+              <div className="h-3 w-16 animate-pulse rounded bg-muted" />
+            </div>
+          </div>
           <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+            <div key={i} className={cn("flex", i % 2 === 0 ? "justify-start" : "justify-end")}>
+              <div className="h-4 w-3/4 max-w-[75%] animate-pulse rounded-2xl bg-muted" />
+            </div>
           ))}
         </div>
       </div>
@@ -248,11 +255,13 @@ export default function MessageThread({ conversationId, onBack }) {
   if (error) {
     return (
       <div className="flex h-full flex-col">
-        <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <p className="text-sm text-muted-foreground">Could not load messages.</p>
+        <div className="flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <p className="text-sm text-muted-foreground">Could not load messages.</p>
+          </div>
           <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -263,28 +272,30 @@ export default function MessageThread({ conversationId, onBack }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-        <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="relative">
-          <UserAvatar username={participant.username} displayName={participant.name} className="h-8 w-8" />
-          {participant.isOnline && (
-            <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-400 ring-2 ring-background" />
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          {participant.username ? (
-            <Link to={`/profile/${participant.username}`} className="truncate text-sm font-medium hover:underline">
-              {participant.name || participant.username || "Conversation"}
-            </Link>
-          ) : (
-            <p className="truncate text-sm font-medium">{participant.name || participant.username || "Conversation"}</p>
-          )}
-          {participant.isOnline && <p className="text-[10px] text-green-500">Online</p>}
-          {typingUsers.size > 0 && (
-            <p className="text-[10px] text-muted-foreground">Typing…</p>
-          )}
+      <div className="flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={onBack} aria-label="Back">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="relative">
+            <UserAvatar username={participant.username} displayName={participant.name} className="h-9 w-9 ring-2 ring-background" />
+            {participant.isOnline && (
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-background" />
+            )}
+          </div>
+          <div className="min-w-0">
+            {participant.username ? (
+              <Link to={`/profile/${participant.username}`} className="truncate text-sm font-semibold hover:underline">
+                {participant.name || participant.username || "Conversation"}
+              </Link>
+            ) : (
+              <p className="truncate text-sm font-semibold">{participant.name || participant.username || "Conversation"}</p>
+            )}
+            {participant.isOnline && <p className="text-[10px] text-green-500">Online</p>}
+            {typingUsers.size > 0 && (
+              <p className="text-[10px] text-muted-foreground">Typing…</p>
+            )}
+          </div>
         </div>
         {/* Desktop back button - shown alongside conversation list */}
         <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
@@ -292,16 +303,23 @@ export default function MessageThread({ conversationId, onBack }) {
         </Button>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-4 scrollbar-thin">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4 scrollbar-thin">
         {messages.map((m) => {
           const isYou = m.isOwn;
           return (
             <div key={m.id} className={cn("flex", isYou ? "justify-end" : "justify-start")}>
               <div className={cn("max-w-[75%] space-y-1", isYou && "items-end")}>
-                <div className={cn("rounded-lg px-3 py-2 text-sm", isYou ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
+                <div
+                  className={cn(
+                    "rounded-2xl px-4 py-2.5 text-sm shadow-sm",
+                    isYou
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-accent text-accent-foreground"
+                  )}
+                >
                   {m.text}
                 </div>
-                <div className={cn("flex items-center gap-1 text-[10px] text-muted-foreground", isYou && "justify-end")}>
+                <div className={cn("flex items-center gap-1.5 text-[10px] text-muted-foreground", isYou && "justify-end")}>
                   <span>{formatRelativeTime(m.sentAt)}</span>
                   {isYou && (
                     <span className="text-xs">
@@ -316,15 +334,16 @@ export default function MessageThread({ conversationId, onBack }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-border p-3">
+      <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-border bg-background/95 p-3 shadow-sm">
         <Input
           placeholder="Type a message…"
           value={draft}
           onChange={handleTyping}
           onBlur={handleBlur}
           disabled={sending}
+          className="border-border/50 focus:border-primary"
         />
-        <Button type="submit" size="icon" disabled={!draft.trim() || sending} aria-label="Send">
+        <Button type="submit" size="icon" disabled={!draft.trim() || sending} aria-label="Send" className="bg-primary text-primary-foreground hover:bg-primary/90">
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </form>

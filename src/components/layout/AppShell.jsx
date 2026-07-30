@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { MobileBottomNav, MobileNavSheet } from "./MobileNav";
 import CommandPalette from "./CommandPalette";
+import { cn } from "@/lib/utils";
 
 export default function AppShell() {
   const [commandOpen, setCommandOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function AppShell() {
           onOpenMobileNav={() => setMobileNavOpen(true)}
           showBackButton={location.pathname !== "/dashboard"}
         />
-        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0">
+        <main className={cn("flex-1 overflow-y-auto", location.pathname === "/messages" ? "pb-0" : "pb-16 lg:pb-0")}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

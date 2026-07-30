@@ -12,20 +12,35 @@ import api from "@/lib/api";
 
 /**
  * Adapts a backend conversation to the shape expected by ConversationList/MessageThread.
- * Backend: { _id, type, participants, otherParticipant: {name, username, avatarUrl}, unreadCount, lastMessage: {preview, sentAt}, lastActivityAt }
- * Frontend: { id, participant, lastMessageAt, unread, lastMessageText }
+ * Backend: { _id, type, participants, otherParticipant: {name, username, avatarUrl}, unreadCount, lastMessage: {preview, sentAt, readBy, deliveredTo, sender}, lastActivityAt }
+ * Frontend: { id, participant, lastMessageAt, unread, lastMessageText, lastMessageStatus }
  */
 function adaptConversation(conv, currentUserId) {
   if (!conv) return null;
   const other = conv.otherParticipant || (conv.participants?.find((p) => p.user?._id !== currentUserId)?.user);
+  const lastMsg = conv.lastMessage || {};
+  const lastMsgSenderId = lastMsg.sender?._id || lastMsg.sender;
+  const isOwnLastMessage = lastMsgSenderId?.toString() === currentUserId?.toString();
+  const readBy = lastMsg.readBy || [];
+  const deliveredTo = lastMsg.deliveredTo || [];
+  // For own last message: check if the other participant has read/delivered it
+  const isReadByOther = isOwnLastMessage && readBy.some((r) => {
+    const readerId = r.user?._id || r.user;
+    return readerId?.toString() !== currentUserId?.toString();
+  });
+  const isDeliveredByOther = isOwnLastMessage && deliveredTo.some((d) => {
+    const deliveredId = d.user?._id || d.user;
+    return deliveredId?.toString() !== currentUserId?.toString();
+  });
   return {
     id: conv._id,
     participant: other?.username || "",
     participantName: other?.name || "",
     participantAvatar: other?.avatarUrl || "",
-    lastMessageAt: conv.lastMessage?.sentAt || conv.lastActivityAt || "",
-    lastMessageText: conv.lastMessage?.preview || "",
+    lastMessageAt: lastMsg.sentAt || conv.lastActivityAt || "",
+    lastMessageText: lastMsg.preview || "",
     unread: conv.unreadCount || 0,
+    lastMessageStatus: isReadByOther ? "seen" : isDeliveredByOther ? "delivered" : isOwnLastMessage ? "sent" : "read",
   };
 }
 
@@ -100,11 +115,11 @@ export default function Messages() {
     <div className="flex h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-3.5rem)]">
       <div
         className={cn(
-          "w-full shrink-0 border-r border-border lg:w-80",
+          "w-full shrink-0 border-r border-border bg-background/95 lg:w-80",
           activeId ? "hidden lg:block" : "block"
         )}
       >
-        <div className="border-b border-border px-4 py-3">
+        <div className="border-b border-border bg-background/95 px-4 py-3 shadow-sm">
           <h1 className="text-lg font-semibold tracking-tight">Messages</h1>
         </div>
         {conversations.length === 0 ? (
