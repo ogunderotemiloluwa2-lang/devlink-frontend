@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Rss, MessageSquare, Globe2, Sparkles } from "lucide-react";
+import { LayoutDashboard, Rss, MessageSquare, Globe2, Sparkles, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
