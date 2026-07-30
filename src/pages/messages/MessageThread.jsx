@@ -13,22 +13,31 @@ import { Link } from "react-router-dom";
 
 /**
  * Adapts a backend message to the shape expected by MessageThread.
- * Backend: { _id, sender: {name, username, avatarUrl}, content, createdAt, readBy }
+ * Backend: { _id, sender: {name, username, avatarUrl}, content, createdAt, readBy, deliveredTo }
  * Frontend: { id, from, text, sentAt, isOwn, isRead, isDelivered }
  *
  * Read receipt logic:
- * - For own messages: show "✓✓" (delivered) by default, "✓✓ Seen" only when the other participant has read it
+ * - For own messages:
+ *   - "✓" (single check) = message sent but not delivered
+ *   - "✓✓" (double check) = message delivered (recipient is online/active)
+ *   - "✓✓ Seen" = message has been read by the other participant
  * - For received messages: show "✓✓ Seen" when the current user has read it
  */
 function adaptMessage(msg, currentUserId) {
   if (!msg) return null;
   const isOwn = msg.sender?._id === currentUserId || msg.sender === currentUserId;
   const readBy = msg.readBy || [];
+  const deliveredTo = msg.deliveredTo || [];
   // For own messages: isRead means the OTHER participant has read it
   // For received messages: isRead means the current user has read it
   const isRead = readBy.some((r) => {
     const readerId = r.user?._id || r.user;
     return readerId !== currentUserId;
+  });
+  // For own messages: isDelivered means the OTHER participant has received it
+  const isDelivered = deliveredTo.some((d) => {
+    const deliveredId = d.user?._id || d.user;
+    return deliveredId !== currentUserId;
   });
   return {
     id: msg._id,
@@ -38,6 +47,7 @@ function adaptMessage(msg, currentUserId) {
     sentAt: msg.createdAt || msg.sentAt || "",
     isOwn,
     isRead,
+    isDelivered,
   };
 }
 
@@ -106,7 +116,8 @@ export default function MessageThread({ conversationId, onBack }) {
         setMessages((prev) => {
           // Prevent duplicates if the message was already added (e.g., from REST response)
           if (prev.some((m) => m.id === adapted.id)) return prev;
-          return [...prev, adapted];
+          // Mark as delivered since we received it via socket
+          return [...prev, { ...adapted, isDelivered: true }];
         });
       }
     };
@@ -293,7 +304,7 @@ export default function MessageThread({ conversationId, onBack }) {
                   <span>{formatRelativeTime(m.sentAt)}</span>
                   {isYou && (
                     <span className="text-xs">
-                      {m.isRead ? "✓✓ Seen" : "✓✓"}
+                      {m.isRead ? "✓✓ Seen" : m.isDelivered ? "✓✓" : "✓"}
                     </span>
                   )}
                 </div>

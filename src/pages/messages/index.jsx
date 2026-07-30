@@ -38,15 +38,13 @@ export default function Messages() {
 
   const conversations = data?.conversations || [];
 
-  // Auto-select conversation from URL param, or first conversation on load
+  // Auto-select conversation from URL param only (don't auto-select first conversation)
   useEffect(() => {
     const c = searchParams.get("c");
     if (c && conversations.find((conv) => conv._id === c)) {
       setActiveId(c);
-    } else if (!activeId && conversations.length > 0) {
-      setActiveId(conversations[0]._id);
     }
-  }, [conversations, activeId, searchParams]);
+  }, [conversations, searchParams]);
 
   // Mark all conversations as read when the messages page is opened
   useEffect(() => {
