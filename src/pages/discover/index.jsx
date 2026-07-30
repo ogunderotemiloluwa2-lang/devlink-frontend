@@ -56,8 +56,9 @@ export default function Discover() {
     const initialStates = {};
     const initialCounts = {};
     users.forEach((u) => {
-      initialStates[u.username] = u.isFollowing || false;
-      initialCounts[u.username] = u.followersCount || 0;
+      const username = u.username || "";
+      initialStates[username] = u.isFollowing || false;
+      initialCounts[username] = u.followersCount || 0;
     });
     setFollowStates((prev) => ({ ...prev, ...initialStates }));
     setFollowersCounts((prev) => ({ ...prev, ...initialCounts }));
@@ -135,23 +136,24 @@ export default function Discover() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {users.map((u, index) => {
           const isLast = index === users.length - 1;
-          const isFollowing = followStates[u.username] || false;
-          const displayName = u.name || u.username;
+          const username = u.username || "";
+          const isFollowing = followStates[username] || false;
+          const displayName = u.name || username;
           const headline = u.headline || u.role || "";
 
           return (
             <Card
-              key={u.username}
+              key={username || u._id}
               ref={isLast ? lastUserRef : null}
               className="group card-hover"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <Link to={`/profile/${u.username}`} className="flex items-center gap-3">
-                    <UserAvatar username={u.username} displayName={displayName} className="h-12 w-12" />
+                  <Link to={`/profile/${username}`} className="flex items-center gap-3">
+                    <UserAvatar username={username} displayName={displayName} className="h-12 w-12" />
                     <div>
                       <p className="font-semibold">{displayName}</p>
-                      <p className="text-sm text-muted-foreground">@{u.username}</p>
+                      <p className="text-sm text-muted-foreground">@{username}</p>
                       {headline && <p className="text-xs text-muted-foreground">{headline}</p>}
                     </div>
                   </Link>
@@ -164,20 +166,6 @@ export default function Discover() {
               </CardHeader>
 
               <CardContent className="pt-0">
-                {/* Stack */}
-                {u.stack && u.stack.length > 0 && (
-                  <div className="mb-3 flex flex-wrap gap-1">
-                    {u.stack.slice(0, 5).map((tech) => (
-                      <Badge key={tech} variant="mono">
-                        {tech}
-                      </Badge>
-                    ))}
-                    {u.stack.length > 5 && (
-                      <Badge variant="mono">+{u.stack.length - 5}</Badge>
-                    )}
-                  </div>
-                )}
-
                 {/* Location */}
                 {u.location && (
                   <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
@@ -188,7 +176,7 @@ export default function Discover() {
 
                 {/* Stats */}
                 <div className="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{followersCounts[u.username] || 0} followers</span>
+                  <span>{followersCounts[username] || u.followersCount || 0} followers</span>
                   <span>{u.followingCount || 0} following</span>
                 </div>
 
@@ -198,7 +186,7 @@ export default function Discover() {
                     variant={isFollowing ? "outline" : "default"}
                     size="sm"
                     className="flex-1"
-                    onClick={() => toggleFollow(u.username)}
+                    onClick={() => toggleFollow(username)}
                   >
                     {isFollowing ? "Following" : "Follow"}
                   </Button>
@@ -206,7 +194,7 @@ export default function Discover() {
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => handleMessage(u.username)}
+                    onClick={() => handleMessage(username)}
                   >
                     <MessageCircle className="mr-1 h-3 w-3" /> Message
                   </Button>

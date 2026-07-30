@@ -213,13 +213,26 @@ export function useUsers(params = {}) {
       const page = reset ? 1 : nextCursor;
       const res = await api.get(`/profiles/users?page=${page}&${queryString}`);
       const { profiles: newUsers, meta } = res.data;
+      // Flatten profile data: merge nested user fields into the profile object
+      const flattened = newUsers.map((p) => {
+        const user = p.user || {};
+        return {
+          ...p,
+          name: user.name || "",
+          username: user.username || "",
+          avatarUrl: user.avatarUrl || null,
+          role: user.role || "",
+          status: user.status || "",
+          userCreatedAt: user.createdAt || null,
+        };
+      });
       if (reset) {
-        setUsers(newUsers);
+        setUsers(flattened);
       } else {
-        setUsers((prev) => [...prev, ...newUsers]);
+        setUsers((prev) => [...prev, ...flattened]);
       }
       setNextCursor((prev) => prev + 1);
-      setHasMore(meta?.hasNextPage ?? newUsers.length > 0);
+      setHasMore(meta?.hasNextPage ?? flattened.length > 0);
     } catch (err) {
       setError(err);
     } finally {
