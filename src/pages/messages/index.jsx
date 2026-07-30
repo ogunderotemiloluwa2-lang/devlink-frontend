@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MessageSquare, Send } from "lucide-react";
 import ConversationList from "./ConversationList";
@@ -51,8 +51,24 @@ export default function Messages() {
   const [activeId, setActiveId] = useState(searchParams.get("c") || null);
   const { data, loading, error, refetch } = useConversations();
   const { toast } = useToast();
+  const errorToastShownRef = useRef(false);
 
   const conversations = data?.conversations || [];
+
+  // Show error toast only once per error (not on every re-render)
+  useEffect(() => {
+    if (error && !errorToastShownRef.current) {
+      // Don't show toast for 401 errors (auth issues are handled elsewhere)
+      if (error.statusCode !== 401) {
+        toast({ title: "Error", description: "Could not load conversations.", variant: "destructive" });
+      }
+      errorToastShownRef.current = true;
+    }
+    // Reset the ref when error clears
+    if (!error) {
+      errorToastShownRef.current = false;
+    }
+  }, [error, toast]);
 
   // Auto-select conversation from URL param only (don't auto-select first conversation)
   useEffect(() => {
@@ -111,7 +127,7 @@ export default function Messages() {
   }
 
   if (error) {
-    toast({ title: "Error", description: "Could not load conversations.", variant: "destructive" });
+    // Error toast is handled in the useEffect above to avoid duplicates
   }
 
   return (
