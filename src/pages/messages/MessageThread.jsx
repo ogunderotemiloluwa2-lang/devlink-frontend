@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserAvatar } from "@/components/ui/avatar";
@@ -9,17 +9,27 @@ import { useSocket } from "@/contexts/SocketContext";
 import { useToast } from "@/components/ui/toast";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import api from "@/lib/api";
+import { Link } from "react-router-dom";
 
 /**
  * Adapts a backend message to the shape expected by MessageThread.
  * Backend: { _id, sender: {name, username, avatarUrl}, content, createdAt, readBy }
- * Frontend: { id, from, text, sentAt, isOwn, isRead }
+ * Frontend: { id, from, text, sentAt, isOwn, isRead, isDelivered }
+ *
+ * Read receipt logic:
+ * - For own messages: show "✓✓" (delivered) by default, "✓✓ Seen" only when the other participant has read it
+ * - For received messages: show "✓✓ Seen" when the current user has read it
  */
 function adaptMessage(msg, currentUserId) {
   if (!msg) return null;
   const isOwn = msg.sender?._id === currentUserId || msg.sender === currentUserId;
   const readBy = msg.readBy || [];
-  const isRead = readBy.some((r) => r.user?._id === currentUserId || r.user === currentUserId);
+  // For own messages: isRead means the OTHER participant has read it
+  // For received messages: isRead means the current user has read it
+  const isRead = readBy.some((r) => {
+    const readerId = r.user?._id || r.user;
+    return readerId !== currentUserId;
+  });
   return {
     id: msg._id,
     from: isOwn ? "you" : (msg.sender?.username || "them"),
@@ -129,11 +139,11 @@ export default function MessageThread({ conversationId, onBack }) {
     socket.on("typing:update", handleTypingUpdate);
 
     const handleConversationRead = ({ userId, readAt }) => {
-      // Mark all messages from the other user as read
+      // When the other participant reads the conversation, mark our own messages as seen
       if (userId === user?._id) return;
       setMessages((prev) =>
         prev.map((m) =>
-          !m.isOwn ? { ...m, isRead: true } : m
+          m.isOwn ? { ...m, isRead: true } : m
         )
       );
     };
@@ -251,8 +261,14 @@ export default function MessageThread({ conversationId, onBack }) {
             <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-400 ring-2 ring-background" />
           )}
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{participant.name || participant.username || "Conversation"}</p>
+        <div className="min-w-0 flex-1">
+          {participant.username ? (
+            <Link to={`/profile/${participant.username}`} className="truncate text-sm font-medium hover:underline">
+              {participant.name || participant.username || "Conversation"}
+            </Link>
+          ) : (
+            <p className="truncate text-sm font-medium">{participant.name || participant.username || "Conversation"}</p>
+          )}
           {participant.isOnline && <p className="text-[10px] text-green-500">Online</p>}
           {typingUsers.size > 0 && (
             <p className="text-[10px] text-muted-foreground">Typing…</p>

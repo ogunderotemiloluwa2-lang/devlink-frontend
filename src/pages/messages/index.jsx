@@ -64,6 +64,11 @@ export default function Messages() {
     setSearchParams({ c: id });
   };
 
+  const handleBack = () => {
+    setActiveId(null);
+    setSearchParams({});
+  };
+
   const activeConversation = conversations.find((c) => c._id === activeId);
 
   if (loading) {
@@ -97,8 +102,8 @@ export default function Messages() {
     <div className="flex h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-3.5rem)]">
       <div
         className={cn(
-          "w-full shrink-0 border-r border-border lg:block lg:w-80",
-          activeId ? "hidden" : "block"
+          "w-full shrink-0 border-r border-border lg:w-80",
+          activeId ? "hidden lg:block" : "block"
         )}
       >
         <div className="border-b border-border px-4 py-3">
@@ -122,7 +127,7 @@ export default function Messages() {
 
       <div className={cn("min-w-0 flex-1", !activeId && "hidden lg:block")}>
         {activeConversation ? (
-          <MessageThread conversationId={activeConversation._id} onBack={() => setActiveId(null)} />
+          <MessageThread conversationId={activeConversation._id} onBack={handleBack} />
         ) : (
           <EmptyState
             icon={MessageSquare}
