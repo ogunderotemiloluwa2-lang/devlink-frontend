@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { useConversations } from "@/hooks/useApi";
+import { useConversations } from "@/contexts/ConversationsContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,12 +28,7 @@ const navItems = [
 
 export default function Sidebar({ onNavigate }) {
   const { user, logout } = useAuth();
-  const { data: convData } = useConversations();
-  const conversations = convData?.conversations || [];
-  const unreadCount = conversations.reduce((sum, c) => {
-    const p = c.participants?.find((p) => p.user?._id === user?._id || p.user === user?._id);
-    return sum + (p?.unreadCount || 0);
-  }, 0);
+  const { unreadCount } = useConversations();
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">

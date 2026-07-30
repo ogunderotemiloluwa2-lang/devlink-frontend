@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { useConversations } from "@/hooks/useApi";
+import { useConversations } from "@/contexts/ConversationsContext";
 import Sidebar from "./Sidebar";
 
 const bottomItems = [
@@ -18,12 +18,7 @@ const bottomItems = [
 
 export function MobileBottomNav() {
   const { user } = useAuth();
-  const { data: convData } = useConversations();
-  const conversations = convData?.conversations || [];
-  const unreadCount = conversations.reduce((sum, c) => {
-    const p = c.participants?.find((p) => p.user?._id === user?._id || p.user === user?._id);
-    return sum + (p?.unreadCount || 0);
-  }, 0);
+  const { unreadCount } = useConversations();
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-center justify-around gap-1 border-t border-border bg-background/95 pb-safe-area-inset-bottom backdrop-blur lg:hidden">

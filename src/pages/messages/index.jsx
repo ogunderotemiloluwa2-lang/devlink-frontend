@@ -4,7 +4,8 @@ import { MessageSquare, Send } from "lucide-react";
 import ConversationList from "./ConversationList";
 import MessageThread from "./MessageThread";
 import EmptyState from "@/components/states/EmptyState";
-import { useApi, useConversations } from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
+import { useConversations } from "@/contexts/ConversationsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -49,11 +50,9 @@ export default function Messages() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeId, setActiveId] = useState(searchParams.get("c") || null);
-  const { data, loading, error, refetch } = useConversations();
+  const { conversations, loading, error, refetch, markAllRead } = useConversations();
   const { toast } = useToast();
   const errorToastShownRef = useRef(false);
-
-  const conversations = data?.conversations || [];
 
   // Show error toast only once per error (not on every re-render)
   useEffect(() => {
@@ -81,15 +80,9 @@ export default function Messages() {
   // Mark all conversations as read when the messages page is opened
   useEffect(() => {
     if (conversations.length > 0) {
-      conversations.forEach((conv) => {
-        if (conv.unreadCount > 0) {
-          api.post(`/conversations/${conv._id}/read`).catch(() => {});
-        }
-      });
-      // Update local state to clear unread counts immediately
-      refetch();
+      markAllRead();
     }
-  }, [conversations]);
+  }, [conversations, markAllRead]);
 
   const handleSelect = (id) => {
     setActiveId(id);
