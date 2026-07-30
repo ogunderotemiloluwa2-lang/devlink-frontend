@@ -116,8 +116,9 @@ export default function MessageThread({ conversationId, onBack }) {
         setMessages((prev) => {
           // Prevent duplicates if the message was already added (e.g., from REST response)
           if (prev.some((m) => m.id === adapted.id)) return prev;
-          // Mark as delivered since we received it via socket
-          return [...prev, { ...adapted, isDelivered: true }];
+          // For received messages (not own), mark as delivered since we received it via socket
+          const isDelivered = adapted.isOwn ? adapted.isDelivered : true;
+          return [...prev, { ...adapted, isDelivered }];
         });
       }
     };
