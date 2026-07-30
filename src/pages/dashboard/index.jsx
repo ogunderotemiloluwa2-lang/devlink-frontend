@@ -5,26 +5,29 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/avatar";
 import EmptyState from "@/components/states/EmptyState";
-import { useMyProfile, useFeed, useAITools, useFollowSuggestions } from "@/hooks/useApi";
+import { useMyProfile, useFeed, useAITools, useFollowSuggestions, useProjects } from "@/hooks/useApi";
 import { adaptPost, formatRelativeTime } from "@/lib/utils";
 
 export default function Dashboard() {
   const { data: myProfile, loading: profileLoading } = useMyProfile();
   const { posts: feedPosts, loading: feedLoading } = useFeed();
   const { data: aiToolsData, loading: toolsLoading } = useAITools({ featured: true });
+  const { data: projectsData, loading: projectsLoading } = useProjects({ status: "active", visibility: "public" });
   const { data: suggestionsData, loading: suggestionsLoading } = useFollowSuggestions(4);
 
   const user = myProfile?.user;
   const profile = myProfile?.profile;
+  const statsData = myProfile?.stats;
 
   const recentPosts = feedPosts?.slice(0, 3).map(adaptPost) || [];
   const suggestedCollaborators = suggestionsData?.users || [];
   const trendingTools = aiToolsData?.tools?.slice().sort((a, b) => b.rating - a.rating).slice(0, 3) || [];
+  const trendingProjects = projectsData?.projects?.slice().sort((a, b) => (b.starsCount || 0) - (a.starsCount || 0)).slice(0, 3) || [];
 
   const stats = [
     { label: "Followers", value: profile?.followersCount || 0, icon: Users2, trend: "+12 this week" },
-    { label: "Profile views (7d)", value: 342, icon: ArrowUpRight, trend: "+8% from last week" },
-    { label: "Post likes (7d)", value: 89, icon: Star, trend: "+21% from last week" },
+    { label: "Profile views (7d)", value: profile?.profileViews || 0, icon: ArrowUpRight, trend: "+8% from last week" },
+    { label: "Post likes (7d)", value: statsData?.totalPostLikes || 0, icon: Star, trend: "+21% from last week" },
   ];
 
   const displayName = user?.name?.split(" ")[0] || "there";
@@ -138,16 +141,22 @@ export default function Dashboard() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            {trendingTools.length === 0 ? (
-              <EmptyState title="No tools found" description="Check back later for new AI tools." />
+            {projectsLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-16 animate-pulse rounded-md bg-muted" />
+                ))}
+              </div>
+            ) : trendingProjects.length === 0 ? (
+              <EmptyState title="No projects found" description="No projects are currently looking for help." />
             ) : (
-              trendingTools.map((tool) => (
-                <div key={tool._id || tool.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
+              trendingProjects.map((project) => (
+                <div key={project._id || project.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="min-w-0 truncate font-mono text-sm font-medium">{tool.name}</p>
-                    <Badge variant="secondary" className="shrink-0">{tool.category}</Badge>
+                    <p className="min-w-0 truncate font-mono text-sm font-medium">{project.name}</p>
+                    <Badge variant="secondary" className="shrink-0">{project.visibility}</Badge>
                   </div>
-                  <p className="mt-1 truncate text-sm text-muted-foreground">{tool.tagline}</p>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">{project.tagline}</p>
                 </div>
               ))
             )}
