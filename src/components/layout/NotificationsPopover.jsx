@@ -54,6 +54,15 @@ export default function NotificationsPopover() {
     }
   };
 
+  const clearAll = async () => {
+    try {
+      await Promise.all(items.map((n) => api.delete(`/notifications/${n._id}`)));
+      setItems([]);
+    } catch (err) {
+      toast({ title: "Error", description: "Could not clear notifications.", variant: "destructive" });
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -68,9 +77,14 @@ export default function NotificationsPopover() {
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <p className="text-sm font-semibold">Notifications</p>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-              Mark all as read
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                Mark all as read
+              </button>
+              <button onClick={clearAll} className="text-xs text-muted-foreground hover:underline">
+                Clear all
+              </button>
+            </div>
           )}
         </div>
         <div className="max-h-80 overflow-y-auto scrollbar-thin">

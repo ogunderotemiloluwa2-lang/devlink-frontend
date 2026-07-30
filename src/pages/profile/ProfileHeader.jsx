@@ -21,9 +21,20 @@ export default function ProfileHeader({ profile }) {
 
   const toggleFollow = async () => {
     try {
-      await api.post(`/follow/${profile.username}`);
-      setFollowing((prev) => !prev);
-      setFollowers((prev) => (following ? prev - 1 : prev + 1));
+      if (following) {
+        // Unfollow
+        await api.delete(`/follow/${profile.username}`);
+        setFollowing(false);
+        setFollowers((prev) => prev - 1);
+      } else {
+        // Follow
+        const res = await api.post(`/follow/${profile.username}`);
+        const isNowFollowing = res.data.following;
+        setFollowing(isNowFollowing);
+        if (isNowFollowing) {
+          setFollowers((prev) => prev + 1);
+        }
+      }
     } catch (err) {
       toast({ title: "Error", description: "Could not update follow status.", variant: "destructive" });
     }

@@ -8,6 +8,7 @@ import { useApi, useConversations } from "@/hooks/useApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+import api from "@/lib/api";
 
 /**
  * Adapts a backend conversation to the shape expected by ConversationList/MessageThread.
@@ -46,6 +47,17 @@ export default function Messages() {
       setActiveId(conversations[0]._id);
     }
   }, [conversations, activeId, searchParams]);
+
+  // Mark all conversations as read when the messages page is opened
+  useEffect(() => {
+    if (conversations.length > 0) {
+      conversations.forEach((conv) => {
+        if (conv.unreadCount > 0) {
+          api.post(`/conversations/${conv._id}/read`).catch(() => {});
+        }
+      });
+    }
+  }, [conversations]);
 
   const handleSelect = (id) => {
     setActiveId(id);

@@ -39,7 +39,8 @@ export default function AppShell() {
             </motion.div>
           </AnimatePresence>
         </main>
-        <MobileBottomNav />
+        {/* Hide mobile bottom nav on the messages page so the chat takes the full screen */}
+        {location.pathname !== "/messages" && <MobileBottomNav />}
       </div>
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />

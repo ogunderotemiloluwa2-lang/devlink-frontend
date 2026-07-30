@@ -210,6 +210,9 @@ export default function MessageThread({ conversationId, onBack }) {
           </Button>
           <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
           <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+          <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
         </div>
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -228,6 +231,9 @@ export default function MessageThread({ conversationId, onBack }) {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <p className="text-sm text-muted-foreground">Could not load messages.</p>
+          <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     );
@@ -252,6 +258,10 @@ export default function MessageThread({ conversationId, onBack }) {
             <p className="text-[10px] text-muted-foreground">Typing…</p>
           )}
         </div>
+        {/* Desktop back button - shown alongside conversation list */}
+        <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={onBack} aria-label="Back to conversations">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto p-4 scrollbar-thin">
