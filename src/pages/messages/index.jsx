@@ -13,7 +13,7 @@ import api from "@/lib/api";
 /**
  * Adapts a backend conversation to the shape expected by ConversationList/MessageThread.
  * Backend: { _id, type, participants, otherParticipant: {name, username, avatarUrl}, unreadCount, lastMessage: {preview, sentAt, readBy, deliveredTo, sender}, lastActivityAt }
- * Frontend: { id, participant, lastMessageAt, unread, lastMessageText, lastMessageStatus }
+ * Frontend: { id, participant, lastMessageAt, unread, lastMessageText, lastMessageStatus, lastMessageSender }
  */
 function adaptConversation(conv, currentUserId) {
   if (!conv) return null;
@@ -41,6 +41,7 @@ function adaptConversation(conv, currentUserId) {
     lastMessageText: lastMsg.preview || "",
     unread: conv.unreadCount || 0,
     lastMessageStatus: isReadByOther ? "seen" : isDeliveredByOther ? "delivered" : isOwnLastMessage ? "sent" : "read",
+    lastMessageSender: isOwnLastMessage ? "me" : (other?.name || other?.username || ""),
   };
 }
 
@@ -69,6 +70,8 @@ export default function Messages() {
           api.post(`/conversations/${conv._id}/read`).catch(() => {});
         }
       });
+      // Update local state to clear unread counts immediately
+      refetch();
     }
   }, [conversations]);
 

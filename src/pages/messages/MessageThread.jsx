@@ -155,7 +155,7 @@ export default function MessageThread({ conversationId, onBack }) {
       if (userId === user?._id) return;
       setMessages((prev) =>
         prev.map((m) =>
-          m.isOwn ? { ...m, isRead: true } : m
+          m.isOwn ? { ...m, isRead: true, isDelivered: true } : m
         )
       );
     };
@@ -190,12 +190,12 @@ export default function MessageThread({ conversationId, onBack }) {
       if (newMsg && !socket) {
         setMessages((prev) => [...prev, newMsg]);
       }
-      setDraft("");
       // Notify others that we stopped typing
       socket?.emit("typing:stop", { conversationId });
     } catch (err) {
       toast({ title: "Error", description: "Could not send message.", variant: "destructive" });
     } finally {
+      setDraft("");
       setSending(false);
     }
   };

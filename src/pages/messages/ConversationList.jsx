@@ -29,6 +29,12 @@ export default function ConversationList({ conversations, activeId, onSelect }) 
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
+                {conv.lastMessageSender && conv.lastMessageSender !== "me" && (
+                  <span className="text-xs font-medium text-muted-foreground/60">{conv.lastMessageSender}:</span>
+                )}
+                {conv.lastMessageSender === "me" && (
+                  <span className="text-xs font-medium text-muted-foreground/60">You:</span>
+                )}
                 <p className="truncate text-xs text-muted-foreground/80">{conv.lastMessageText}</p>
                 {showTick && (
                   <span className={cn("text-xs", tickColor)}>
