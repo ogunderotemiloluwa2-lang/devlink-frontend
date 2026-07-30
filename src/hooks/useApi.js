@@ -193,6 +193,62 @@ export function useFollowSuggestions(limit = 10) {
 }
 
 /**
+ * Fetch all public users with infinite scroll (for the Discover/People page).
+ * Uses cursor-based pagination via page/limit.
+ */
+export function useUsers(params = {}) {
+  const [users, setUsers] = useState([]);
+  const [nextCursor, setNextCursor] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const queryString = new URLSearchParams(params).toString();
+
+  const fetchUsers = useCallback(async (reset = false) => {
+    if (!hasMore && !reset) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const page = reset ? 1 : nextCursor;
+      const res = await api.get(`/profiles/users?page=${page}&${queryString}`);
+      const { profiles: newUsers, meta } = res.data;
+      if (reset) {
+        setUsers(newUsers);
+      } else {
+        setUsers((prev) => [...prev, ...newUsers]);
+      }
+      setNextCursor((prev) => prev + 1);
+      setHasMore(meta?.hasNextPage ?? newUsers.length > 0);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [nextCursor, hasMore, queryString]);
+
+  const loadMore = useCallback(() => {
+    if (hasMore && !loading) {
+      fetchUsers();
+    }
+  }, [hasMore, loading, fetchUsers]);
+
+  const refresh = useCallback(() => {
+    setUsers([]);
+    setNextCursor(1);
+    setHasMore(true);
+    fetchUsers(true);
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    fetchUsers(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(params)]);
+
+  return { users, loading, error, hasMore, loadMore, refresh };
+}
+
+/**
  * Fetch user's skills.
  */
 export function useMySkills() {

@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Feed from "@/pages/feed";
 import Profile from "@/pages/profile";
 import Messages from "@/pages/messages";
+import Discover from "@/pages/discover";
 import AIHub from "@/pages/ai-hub";
 import CollaborationHub from "@/pages/collaboration-hub";
 import CommunityList from "@/pages/community";
@@ -81,6 +82,7 @@ export default function AppRouter() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/ai-hub" element={<AIHub />} />
         <Route path="/collaboration-hub" element={<CollaborationHub />} />
         <Route path="/community" element={<CommunityList />} />

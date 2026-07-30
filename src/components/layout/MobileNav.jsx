@@ -12,6 +12,7 @@ const bottomItems = [
   { to: "/feed", label: "Feed", icon: Rss },
   { to: "/ai-hub", label: "AI", icon: Sparkles },
   { to: "/messages", label: "Messages", icon: MessageSquare },
+  { to: "/discover", label: "Discover", icon: Users2 },
   { to: "/community", label: "Community", icon: Globe2 },
 ];
 

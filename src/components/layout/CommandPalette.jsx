@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -9,6 +9,8 @@ import {
   Globe2,
   Settings,
   User as UserIcon,
+  Search,
+  Loader2,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -18,7 +20,7 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
-import { profiles, communities, aiTools } from "@/lib/demo-data";
+import api from "@/lib/api";
 
 const pages = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -27,31 +29,55 @@ const pages = [
   { label: "AI Hub", to: "/ai-hub", icon: Sparkles },
   { label: "Collaboration Hub", to: "/collaboration-hub", icon: Users2 },
   { label: "Community", to: "/community", icon: Globe2 },
+  { label: "Discover", to: "/discover", icon: Users2 },
   { label: "Settings", to: "/settings/profile", icon: Settings },
 ];
 
 export default function CommandPalette({ open, onOpenChange }) {
   const navigate = useNavigate();
+  const [searchResults, setSearchResults] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const handler = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        onOpenChange((prev) => !prev);
+    const handler = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        setSearchLoading(true);
+        api
+          .get(`/search?q=${encodeURIComponent(searchQuery.trim())}&limit=5`)
+          .then((res) => {
+            setSearchResults(res.data);
+            setSearchLoading(false);
+          })
+          .catch(() => {
+            setSearchResults(null);
+            setSearchLoading(false);
+          });
+      } else {
+        setSearchResults(null);
       }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onOpenChange]);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   const go = (to) => {
     onOpenChange(false);
     navigate(to);
   };
 
+  const handleSearchInput = (value) => {
+    setSearchQuery(value);
+  };
+
+  const developers = searchResults?.developers || [];
+
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search DevLink…" />
+      <CommandInput
+        placeholder="Search DevLink…"
+        onValueChange={handleSearchInput}
+      />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Pages">
@@ -62,31 +88,31 @@ export default function CommandPalette({ open, onOpenChange }) {
             </CommandItem>
           ))}
         </CommandGroup>
-        <CommandGroup heading="People">
-          {profiles.slice(0, 6).map((p) => (
-            <CommandItem key={p.username} onSelect={() => go(`/profile/${p.username}`)}>
-              <UserIcon className="h-4 w-4 text-muted-foreground" />
-              {p.name}
-              <span className="ml-auto text-xs text-muted-foreground">@{p.username}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandGroup heading="Communities">
-          {communities.slice(0, 4).map((c) => (
-            <CommandItem key={c.id} onSelect={() => go(`/community/${c.slug}`)}>
-              <Globe2 className="h-4 w-4 text-muted-foreground" />
-              {c.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandGroup heading="AI Tools">
-          {aiTools.slice(0, 4).map((t) => (
-            <CommandItem key={t.id} onSelect={() => go("/ai-hub")}>
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
-              {t.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        {searchQuery.trim().length >= 2 && (
+          <>
+            {searchLoading ? (
+              <CommandGroup heading="People">
+                <CommandItem disabled>
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  Searching…
+                </CommandItem>
+              </CommandGroup>
+            ) : developers.length > 0 ? (
+              <CommandGroup heading="People">
+                {developers.map((p) => (
+                  <CommandItem
+                    key={p.username}
+                    onSelect={() => go(`/profile/${p.username}`)}
+                  >
+                    <UserIcon className="h-4 w-4 text-muted-foreground" />
+                    {p.name}
+                    <span className="ml-auto text-xs text-muted-foreground">@{p.username}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ) : null}
+          </>
+        )}
       </CommandList>
     </CommandDialog>
   );
