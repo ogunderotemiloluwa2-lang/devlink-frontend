@@ -5,7 +5,7 @@ import {
   Rss,
   MessageSquare,
   Sparkles,
-  Users2,
+  Users,
   Globe2,
   Settings,
   User as UserIcon,
@@ -27,9 +27,9 @@ const pages = [
   { label: "Feed", to: "/feed", icon: Rss },
   { label: "Messages", to: "/messages", icon: MessageSquare },
   { label: "AI Hub", to: "/ai-hub", icon: Sparkles },
-  { label: "Collaboration Hub", to: "/collaboration-hub", icon: Users2 },
+  { label: "Collaboration Hub", to: "/collaboration-hub", icon: Users },
   { label: "Community", to: "/community", icon: Globe2 },
-  { label: "Discover", to: "/discover", icon: Users2 },
+  { label: "Discover", to: "/discover", icon: Users },
   { label: "Settings", to: "/settings/profile", icon: Settings },
 ];
 

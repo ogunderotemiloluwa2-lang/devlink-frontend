@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Users2, MessageSquare, Globe2 } from "lucide-react";
+import { Users, MessageSquare, Globe2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/ui/avatar";
@@ -96,7 +96,7 @@ export default function CommunityDetail() {
 
       <div className="flex items-center gap-5 border-y border-border py-3 text-sm">
         <span className="flex items-center gap-1.5">
-          <Users2 className="h-4 w-4 text-muted-foreground" />
+          <Users className="h-4 w-4 text-muted-foreground" />
           <strong className="font-semibold">{community.membersCount?.toLocaleString() || 0}</strong>
           <span className="text-muted-foreground">members</span>
         </span>

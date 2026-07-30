@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Heart, MessageCircle, UserPlus, Users2, Mail } from "lucide-react";
+import { Bell, Heart, MessageCircle, UserPlus, Users, Mail } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/avatar";
@@ -14,10 +14,10 @@ const iconByType = {
   comment: MessageCircle,
   reply: MessageCircle,
   mention: MessageCircle,
-  collab: Users2,
+  collab: Users,
   message: Mail,
-  projectInvite: Users2,
-  communityInvite: Users2,
+  projectInvite: Users,
+  communityInvite: Users,
 };
 
 export default function NotificationsPopover() {

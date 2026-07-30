@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link2, MapPin, Github, Calendar, Users2, MessageCircle } from "lucide-react";
+import { Link2, MapPin, Github, Calendar, Users, MessageCircle } from "lucide-react";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -140,7 +140,7 @@ export default function ProfileHeader({ profile }) {
           </span>
           {profile.openToCollab && (
             <span className="flex items-center gap-1 text-muted-foreground">
-              <Users2 className="h-3.5 w-3.5" /> Open to collaboration
+              <Users className="h-3.5 w-3.5" /> Open to collaboration
             </span>
           )}
         </div>

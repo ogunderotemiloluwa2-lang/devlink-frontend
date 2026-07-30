@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Globe2, Users2, MessageSquare } from "lucide-react";
+import { Globe2, Users, MessageSquare } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,7 +106,7 @@ export default function CommunityList() {
                 <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Users2 className="h-3 w-3" /> {c.members.toLocaleString()}
+                      <Users className="h-3 w-3" /> {c.members.toLocaleString()}
                     </span>
                     <span className="flex items-center gap-1">
                       <MessageSquare className="h-3 w-3" /> {c.posts.toLocaleString()}

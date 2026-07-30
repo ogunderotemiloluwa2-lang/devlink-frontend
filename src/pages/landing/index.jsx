@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Code2, ArrowRight, Github, Users2, Sparkles, MessageSquare, Globe2, Star, GitFork } from "lucide-react";
+import { Code2, ArrowRight, Github, Users, Sparkles, MessageSquare, Globe2, Star, GitFork } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const features = [
   {
-    icon: Users2,
+    icon: Users,
     title: "Find collaborators",
     description: "Browse real projects looking for the exact role you play — not a generic job board.",
   },

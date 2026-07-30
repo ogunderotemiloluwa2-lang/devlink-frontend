@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Users2 } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "./ProjectCard";
@@ -91,7 +91,7 @@ export default function CollaborationHub() {
           </p>
         </div>
         <EmptyState
-          icon={Users2}
+          icon={Users}
           title="Something went wrong"
           description="Could not load projects. Please try again."
         />
@@ -147,7 +147,7 @@ export default function CollaborationHub() {
 
       {filteredProjects.length === 0 ? (
         <EmptyState
-          icon={Users2}
+          icon={Users}
           title="No projects match your filters"
           description="Try clearing a filter or searching a different keyword."
         />

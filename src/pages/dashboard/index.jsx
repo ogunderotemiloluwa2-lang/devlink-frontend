@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Users2, Star, MessageCircle, Sparkles, Rss, GitFork, ExternalLink } from "lucide-react";
+import { ArrowUpRight, Users, Star, MessageCircle, Sparkles, Rss, GitFork, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ export default function Dashboard() {
   const trendingProjects = projectsData?.projects?.slice().sort((a, b) => (b.starsCount || 0) - (a.starsCount || 0)).slice(0, 3) || [];
 
   const stats = [
-    { label: "Followers", value: profile?.followersCount || 0, icon: Users2, trend: "+12 this week" },
+    { label: "Followers", value: profile?.followersCount || 0, icon: Users, trend: "+12 this week" },
     { label: "Profile views (7d)", value: profile?.profileViews || 0, icon: ArrowUpRight, trend: "+8% from last week" },
     { label: "Post likes (7d)", value: statsData?.totalPostLikes || 0, icon: Star, trend: "+21% from last week" },
   ];
@@ -98,7 +98,7 @@ export default function Dashboard() {
         <Card className="card-hover">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Users2 className="h-4 w-4" /> Suggested collaborators
+              <Users className="h-4 w-4" /> Suggested collaborators
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">

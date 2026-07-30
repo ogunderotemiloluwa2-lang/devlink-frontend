@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Users2, MapPin, MessageCircle } from "lucide-react";
+import { Search, Users, MapPin, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,7 @@ export default function Discover() {
     return (
       <div className="container max-w-6xl py-8">
         <EmptyState
-          icon={Users2}
+          icon={Users}
           title="Something went wrong"
           description="Could not load users. Please try again."
           action={
@@ -257,7 +257,7 @@ export default function Discover() {
       {/* No results */}
       {!loading && users.length === 0 && debouncedQuery && (
         <EmptyState
-          icon={Users2}
+          icon={Users}
           title="No users found"
           description={`No developers match "${debouncedQuery}". Try a different search.`}
           action={

@@ -4,7 +4,7 @@ import {
   Rss,
   MessageSquare,
   Sparkles,
-  Users2,
+  Users,
   Globe2,
   Settings,
   User,
@@ -20,9 +20,9 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/feed", label: "Feed", icon: Rss },
   { to: "/messages", label: "Messages", icon: MessageSquare },
-  { to: "/discover", label: "Discover", icon: Users2 },
+  { to: "/discover", label: "Discover", icon: Users },
   { to: "/ai-hub", label: "AI Hub", icon: Sparkles },
-  { to: "/collaboration-hub", label: "Collaboration Hub", icon: Users2 },
+  { to: "/collaboration-hub", label: "Collaboration Hub", icon: Users },
   { to: "/community", label: "Community", icon: Globe2 },
 ];
 
