@@ -90,7 +90,11 @@ export default function MessageThread({ conversationId, onBack }) {
     const handleNewMessage = (message) => {
       const adapted = adaptMessage(message, user?._id);
       if (adapted) {
-        setMessages((prev) => [...prev, adapted]);
+        setMessages((prev) => {
+          // Prevent duplicates if the message was already added (e.g., from REST response)
+          if (prev.some((m) => m.id === adapted.id)) return prev;
+          return [...prev, adapted];
+        });
       }
     };
 
@@ -136,7 +140,10 @@ export default function MessageThread({ conversationId, onBack }) {
     try {
       const res = await api.post(`/conversations/${conversationId}/messages`, { content: draft });
       const newMsg = adaptMessage(res.data.message || res.data, user?._id);
-      if (newMsg) {
+      // Only add the message locally if the socket is not connected.
+      // When the socket is connected, the "message:new" event will handle
+      // adding it to avoid duplicates.
+      if (newMsg && !socket) {
         setMessages((prev) => [...prev, newMsg]);
       }
       setDraft("");
