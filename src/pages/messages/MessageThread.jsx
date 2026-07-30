@@ -12,12 +12,14 @@ import api from "@/lib/api";
 
 /**
  * Adapts a backend message to the shape expected by MessageThread.
- * Backend: { _id, sender: {name, username, avatarUrl}, content, createdAt }
- * Frontend: { id, from, text, sentAt, isOwn }
+ * Backend: { _id, sender: {name, username, avatarUrl}, content, createdAt, readBy }
+ * Frontend: { id, from, text, sentAt, isOwn, isRead }
  */
 function adaptMessage(msg, currentUserId) {
   if (!msg) return null;
   const isOwn = msg.sender?._id === currentUserId || msg.sender === currentUserId;
+  const readBy = msg.readBy || [];
+  const isRead = readBy.some((r) => r.user?._id === currentUserId || r.user === currentUserId);
   return {
     id: msg._id,
     from: isOwn ? "you" : (msg.sender?.username || "them"),
@@ -25,6 +27,7 @@ function adaptMessage(msg, currentUserId) {
     text: msg.content || "",
     sentAt: msg.createdAt || msg.sentAt || "",
     isOwn,
+    isRead,
   };
 }
 
@@ -125,13 +128,32 @@ export default function MessageThread({ conversationId, onBack }) {
     socket.on("message:new", handleNewMessage);
     socket.on("typing:update", handleTypingUpdate);
 
+    const handleConversationRead = ({ userId, readAt }) => {
+      // Mark all messages from the other user as read
+      if (userId === user?._id) return;
+      setMessages((prev) =>
+        prev.map((m) =>
+          !m.isOwn ? { ...m, isRead: true } : m
+        )
+      );
+    };
+
+    socket.on("conversation:read", handleConversationRead);
+
     return () => {
       socket.emit("conversation:leave", conversationId);
       socket.off("message:new", handleNewMessage);
       socket.off("typing:update", handleTypingUpdate);
+      socket.off("conversation:read", handleConversationRead);
       clearTimeout(typingTimeoutRef.current);
     };
   }, [socket, conversationId, user?._id]);
+
+  // Mark conversation as read when it's opened
+  useEffect(() => {
+    if (!conversationId) return;
+    api.post(`/conversations/${conversationId}/read`).catch(() => {});
+  }, [conversationId]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -238,17 +260,17 @@ export default function MessageThread({ conversationId, onBack }) {
           return (
             <div key={m.id} className={cn("flex", isYou ? "justify-end" : "justify-start")}>
               <div className={cn("max-w-[75%] space-y-1", isYou && "items-end")}>
-                <div
-                  className={cn(
-                    "rounded-lg px-3 py-2 text-sm",
-                    isYou ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                  )}
-                >
+                <div className={cn("rounded-lg px-3 py-2 text-sm", isYou ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
                   {m.text}
                 </div>
-                <p className={cn("text-[10px] text-muted-foreground", isYou && "text-right")}>
-                  {formatRelativeTime(m.sentAt)}
-                </p>
+                <div className={cn("flex items-center gap-1 text-[10px] text-muted-foreground", isYou && "justify-end")}>
+                  <span>{formatRelativeTime(m.sentAt)}</span>
+                  {isYou && (
+                    <span className="text-xs">
+                      {m.isRead ? "✓✓ Seen" : "✓✓"}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           );
