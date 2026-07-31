@@ -74,10 +74,12 @@ export default function Messages() {
   // Auto-select conversation from URL param only (don't auto-select first conversation)
   useEffect(() => {
     const c = searchParams.get("c");
-    if (c && conversations.find((conv) => conv._id === c)) {
+    if (c) {
+      // Set activeId from URL param even if conversation isn't in the list yet
+      // (e.g., when coming from Discover page where a new conversation was just created)
       setActiveId(c);
     }
-  }, [conversations, searchParams]);
+  }, [searchParams]);
 
   // Mark all conversations as read when the messages page is opened
   useEffect(() => {
