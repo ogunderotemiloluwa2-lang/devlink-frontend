@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { MessageSquare, Send } from "lucide-react";
 import ConversationList from "./ConversationList";
 import MessageThread from "./MessageThread";
@@ -48,6 +48,8 @@ function adaptConversation(conv, currentUserId) {
 
 export default function Messages() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeId, setActiveId] = useState(searchParams.get("c") || null);
   const { conversations, loading, error, refetch, markAllRead } = useConversations();
@@ -90,8 +92,14 @@ export default function Messages() {
   };
 
   const handleBack = () => {
-    setActiveId(null);
-    setSearchParams({});
+    // If we navigated here from another page (e.g., Discover), go back to that page
+    // Otherwise, just go back to the conversation list
+    if (location.key && window.history.length > 1) {
+      navigate(-1);
+    } else {
+      setActiveId(null);
+      setSearchParams({});
+    }
   };
 
   const activeConversation = conversations.find((c) => c._id === activeId);
