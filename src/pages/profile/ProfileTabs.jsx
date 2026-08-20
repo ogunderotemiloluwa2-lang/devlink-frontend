@@ -9,13 +9,12 @@ import { useApi } from "@/hooks/useApi";
 import { adaptPost, formatRelativeTime } from "@/lib/utils";
 
 export default function ProfileTabs({ profile }) {
-  // Fetch posts by this author using the search endpoint
-  const { data: searchResults, loading: postsLoading } = useApi(
-    `/search?q=${encodeURIComponent(profile.username)}&type=posts`,
-    { deps: [profile.username] }
-  );
+  // Fetch posts by this author using the dedicated endpoint
+  const { data: postsData, loading: postsLoading } = useApi(`/posts/user/${profile.username}`, {
+    deps: [profile.username],
+  });
 
-  const authorPosts = (searchResults?.posts || []).map(adaptPost);
+  const authorPosts = (postsData?.posts || []).map(adaptPost);
   const ownedProjects = [];
 
   const activity = [

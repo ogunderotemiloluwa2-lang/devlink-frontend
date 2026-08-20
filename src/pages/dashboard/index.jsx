@@ -7,6 +7,9 @@ import { UserAvatar } from "@/components/ui/avatar";
 import EmptyState from "@/components/states/EmptyState";
 import { useMyProfile, useFeed, useAITools, useFollowSuggestions, useProjects } from "@/hooks/useApi";
 import { adaptPost, formatRelativeTime } from "@/lib/utils";
+import { useState } from "react";
+import { useToast } from "@/components/ui/toast";
+import api from "@/lib/api";
 
 export default function Dashboard() {
   const { data: myProfile, loading: profileLoading } = useMyProfile();
@@ -14,6 +17,18 @@ export default function Dashboard() {
   const { data: aiToolsData, loading: toolsLoading } = useAITools({ featured: true });
   const { data: projectsData, loading: projectsLoading } = useProjects({ status: "active", visibility: "public" });
   const { data: suggestionsData, loading: suggestionsLoading } = useFollowSuggestions(4);
+  const { toast } = useToast();
+  const [followedUsernames, setFollowedUsernames] = useState({});
+
+  const handleFollow = async (username, name) => {
+    try {
+      await api.post(`/follow/${username}`);
+      setFollowedUsernames((prev) => ({ ...prev, [username]: true }));
+      toast({ title: "Now following", description: `You are now following ${name}.` });
+    } catch (err) {
+      toast({ title: "Error", description: "Could not follow this developer.", variant: "destructive" });
+    }
+  };
 
   const user = myProfile?.user;
   const profile = myProfile?.profile;
@@ -120,8 +135,13 @@ export default function Dashboard() {
                     </Link>
                     <p className="truncate text-xs text-muted-foreground">{p.headline || p.role}</p>
                   </div>
-                  <Button variant="outline" size="sm" className="group-hover:border-primary/50">
-                    Follow
+                  <Button
+                    variant={followedUsernames[p.username] ? "secondary" : "outline"}
+                    size="sm"
+                    className="group-hover:border-primary/50"
+                    onClick={() => handleFollow(p.username, p.name)}
+                  >
+                    {followedUsernames[p.username] ? "Following" : "Follow"}
                   </Button>
                 </div>
               ))

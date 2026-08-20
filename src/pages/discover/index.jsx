@@ -65,12 +65,17 @@ export default function Discover() {
   }, [users]);
 
   const toggleFollow = async (username) => {
+    const isFollowing = followStates[username] || false;
     try {
-      await api.post(`/follow/${username}`);
-      setFollowStates((prev) => ({ ...prev, [username]: !prev[username] }));
+      if (isFollowing) {
+        await api.delete(`/follow/${username}`);
+      } else {
+        await api.post(`/follow/${username}`);
+      }
+      setFollowStates((prev) => ({ ...prev, [username]: !isFollowing }));
       setFollowersCounts((prev) => ({
         ...prev,
-        [username]: prev[username] + (followStates[username] ? -1 : 1),
+        [username]: Math.max((prev[username] || 0) + (isFollowing ? -1 : 1), 0),
       }));
     } catch (err) {
       toast({ title: "Error", description: "Could not update follow status.", variant: "destructive" });

@@ -45,9 +45,7 @@ export default function NotificationsPopover() {
 
   const markAllRead = async () => {
     try {
-      await Promise.all(
-        items.filter((n) => !n.isRead).map((n) => api.patch(`/notifications/${n._id}/read`))
-      );
+      await api.post("/notifications/read-all");
       setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {
       toast({ title: "Error", description: "Could not mark notifications as read.", variant: "destructive" });
@@ -56,7 +54,7 @@ export default function NotificationsPopover() {
 
   const clearAll = async () => {
     try {
-      await Promise.all(items.map((n) => api.delete(`/notifications/${n._id}`)));
+      await api.delete("/notifications");
       setItems([]);
     } catch (err) {
       toast({ title: "Error", description: "Could not clear notifications.", variant: "destructive" });

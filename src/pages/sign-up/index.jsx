@@ -53,7 +53,17 @@ export default function SignUp() {
           <p className="text-sm text-muted-foreground">Set up your profile in under two minutes</p>
         </div>
 
-        <Button variant="outline" className="w-full transition-transform hover:scale-[1.01]">
+        <Button
+          variant="outline"
+          className="w-full transition-transform hover:scale-[1.01]"
+          onClick={() =>
+            toast({
+              title: "GitHub sign-up is not available yet",
+              description: "Create an account with your email and password for now.",
+              variant: "destructive",
+            })
+          }
+        >
           <Github className="mr-2 h-4 w-4" /> Sign up with GitHub
         </Button>
 

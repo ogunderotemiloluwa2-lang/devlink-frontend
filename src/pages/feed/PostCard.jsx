@@ -23,9 +23,9 @@ export default function PostCard({ post }) {
 
   const toggleLike = async () => {
     try {
-      await api.post(`/likes`, { targetType: "post", targetId: post.id });
-      setLiked((prev) => !prev);
-      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      const res = await api.post(`/posts/${post.id}/like`);
+      setLiked(res.data.liked);
+      setLikeCount((prev) => (res.data.liked ? prev + 1 : Math.max(prev - 1, 0)));
     } catch (err) {
       toast({ title: "Error", description: "Could not update like.", variant: "destructive" });
     }
@@ -33,10 +33,25 @@ export default function PostCard({ post }) {
 
   const toggleBookmark = async () => {
     try {
-      await api.post(`/bookmarks`, { postId: post.id });
-      setBookmarked((prev) => !prev);
+      const res = await api.post(`/posts/${post.id}/bookmark`);
+      setBookmarked(res.data.bookmarked);
     } catch (err) {
       toast({ title: "Error", description: "Could not update bookmark.", variant: "destructive" });
+    }
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/feed`;
+    const shareData = { title: "DevLink post", text: post.content || "Check out this post on DevLink", url };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "Link copied", description: "Post link copied to clipboard." });
+      }
+    } catch (err) {
+      // User cancelled share — ignore
     }
   };
 
@@ -144,7 +159,11 @@ export default function PostCard({ post }) {
                 <Repeat2 className="h-3.5 w-3.5" />
                 {post.reposts.toLocaleString()}
               </span>
-              <button className="ml-auto flex items-center gap-1.5 text-xs hover:text-foreground">
+              <button
+                onClick={handleShare}
+                className="ml-auto flex items-center gap-1.5 text-xs hover:text-foreground"
+                aria-label="Share post"
+              >
                 <Share className="h-3.5 w-3.5" />
               </button>
               <button

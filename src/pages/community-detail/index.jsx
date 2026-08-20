@@ -33,11 +33,21 @@ export default function CommunityDetail() {
 
   const handleJoin = async () => {
     try {
-      await api.post(`/communities/${id}/join`);
-      setJoined(true);
-      toast({ title: "Joined", description: "You've joined this community." });
+      if (joined) {
+        await api.post(`/communities/${id}/leave`);
+        setJoined(false);
+        toast({ title: "Left", description: "You've left this community." });
+      } else {
+        await api.post(`/communities/${id}/join`);
+        setJoined(true);
+        toast({ title: "Joined", description: "You've joined this community." });
+      }
     } catch (err) {
-      toast({ title: "Error", description: "Could not join community.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err?.response?.data?.message || "Could not update membership.",
+        variant: "destructive",
+      });
     }
   };
 

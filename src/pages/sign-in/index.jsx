@@ -53,7 +53,17 @@ export default function SignIn() {
           <p className="text-sm text-muted-foreground">Sign in to continue to DevLink</p>
         </div>
 
-        <Button variant="outline" className="w-full transition-transform hover:scale-[1.01]">
+        <Button
+          variant="outline"
+          className="w-full transition-transform hover:scale-[1.01]"
+          onClick={() =>
+            toast({
+              title: "GitHub sign-in is not available yet",
+              description: "Sign in with your email and password for now.",
+              variant: "destructive",
+            })
+          }
+        >
           <Github className="mr-2 h-4 w-4" /> Continue with GitHub
         </Button>
 
@@ -79,9 +89,9 @@ export default function SignIn() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <button type="button" className="text-xs text-primary hover:underline">
+              <Link to="/forgot-password" className="text-xs text-primary hover:underline">
                 Forgot password?
-              </button>
+              </Link>
             </div>
             <Input
               id="password"

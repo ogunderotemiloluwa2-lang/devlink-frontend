@@ -15,16 +15,16 @@ export default function Feed() {
   // Adapt backend posts to frontend shape
   const adaptedPosts = posts.map(adaptPost);
 
-  const handleNewPost = ({ content, type }) => {
+  const handleNewPost = (post) => {
     // Optimistically add the post locally
-    if (myProfile?.user) {
+    if (myProfile?.user && post) {
       const optimisticPost = {
         id: `local-${Date.now()}`,
         author: myProfile.user.username,
         authorName: myProfile.user.name,
-        type,
-        content,
-        tags: [],
+        type: post.type || "text",
+        content: post.content || "",
+        tags: post.hashtags || [],
         likes: 0,
         comments: 0,
         reposts: 0,

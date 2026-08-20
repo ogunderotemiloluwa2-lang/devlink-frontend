@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { useToast } from "@/components/ui/toast";
 import ToolCard from "./ToolCard";
 import EmptyState from "@/components/states/EmptyState";
 import { useApi, useAITools } from "@/hooks/useApi";
@@ -31,6 +32,7 @@ function adaptTool(tool) {
 }
 
 export default function AIHub() {
+  const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedTool, setSelectedTool] = useState(null);
@@ -185,7 +187,18 @@ export default function AIHub() {
                 </div>
               </div>
 
-              <Button className="mt-auto">Visit tool</Button>
+              <Button
+                className="mt-auto"
+                onClick={() => {
+                  if (selectedTool.websiteUrl) {
+                    window.open(selectedTool.websiteUrl, "_blank", "noopener,noreferrer");
+                  } else {
+                    toast({ title: "No website", description: "This tool doesn't have a website link yet." });
+                  }
+                }}
+              >
+                Visit tool
+              </Button>
             </div>
           )}
         </SheetContent>
