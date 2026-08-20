@@ -12,6 +12,7 @@ import Feed from "@/pages/feed";
 import Profile from "@/pages/profile";
 import Messages from "@/pages/messages";
 import AIHub from "@/pages/ai-hub";
+import Discover from "@/pages/discover";
 import CollaborationHub from "@/pages/collaboration-hub";
 import CommunityList from "@/pages/community";
 import CommunityDetail from "@/pages/community-detail";
@@ -91,6 +92,7 @@ export default function AppRouter() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/ai-hub" element={<AIHub />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/collaboration-hub" element={<CollaborationHub />} />
         <Route path="/community" element={<CommunityList />} />
         <Route path="/community/:id" element={<CommunityDetail />} />
